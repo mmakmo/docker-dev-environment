@@ -1,0 +1,18 @@
+version: '2'
+
+services:
+  dev-linux:
+    build:
+      context: ./dev-linux
+      dockerfile: Dockerfile
+    image: 'dev-linux'
+    volumes:
+      - '../:/root/src'
+
+  cypress:
+    build:
+      context: ./cypress
+      dockerfile: Dockerfile
+    image: 'dev-cypress'
+    volumes:
+      - '../tests:/root/src/cypress'
