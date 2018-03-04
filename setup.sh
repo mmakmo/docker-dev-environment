@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # /z/development/docker/docker-dev-environment
 # @powershell -NoProfile -ExecutionPolicy unrestricted -Command "Start-Process powershell.exe -Verb runas && ./bin/install.ps1"
@@ -172,6 +172,9 @@ if [ -z "$(grep '~/git-completion.bash' ${HOME}/.bashrc)" ] ; then
     echo '~/git-completion.bash' >> ${HOME}/.bashrc
     source ${HOME}/.bashrc
 fi
+
+rm -rf ./dockerfiles/viron
+git clone https://github.com/cam-inc/viron.git ./dockerfiles/viron
 
 docker-compose -f ./dockerfiles/docker-compose.yml build
 docker-compose -f ./dockerfiles/docker-compose.yml up -d
