@@ -1,0 +1,101 @@
+version: '3'
+
+services:
+  dev-linux:
+    container_name: dev-linux
+    hostname: dev-linux
+    build:
+      context: ./dev-linux
+      dockerfile: Dockerfile
+    image: 'dev-linux'
+    networks:
+      dev:
+        ipv4_address: 172.16.238.11
+    volumes:
+      - '../:/root/src'
+
+  cypress:
+    container_name: cypress
+    hostname: cypress
+    build:
+      context: ./cypress
+      dockerfile: Dockerfile
+    image: 'dev-cypress'
+    networks:
+      dev:
+        ipv4_address: 172.16.238.12
+    volumes:
+      - '../tests:/root/src/cypress'
+
+  viron:
+    container_name: viron
+    hostname: viron
+    build:
+      context: ./viron
+      dockerfile: Dockerfile
+    image: 'viron'
+    working_dir: /viron
+    ports:
+      - 8210:8080
+    environment:
+      - SHELL=/bin/bash
+    networks:
+      dev:
+        ipv4_address: 172.16.238.13
+    volumes:
+      - ./viron/.editorconfig:/viron/.editorconfig
+      - ./viron/.eslintrc.js:/viron/.eslintrc.js
+      - ./viron/.stylefmtrc:/viron/.stylefmtrc
+      - ./viron/.stylelintrc:/viron/.stylelintrc
+      - ./viron/package-lock.json:/viron/package-lock.json
+      - ./viron/package.json:/viron/package.json
+      - ./viron/postcss.config.js:/viron/postcss.config.js
+      - ./viron/public:/viron/public
+      - ./viron/rollup.base.config.js:/viron/rollup.base.config.js
+      - ./viron/rollup.config.js:/viron/rollup.config.js
+      - ./viron/rollup.local.config.js:/viron/rollup.local.config.js
+      - ./viron/src:/viron/src
+      - ./viron/task:/viron/task
+      - ./viron/test:/viron/test
+    command: npm run start
+
+  jenkins:
+    container_name: jenkins
+    hostname: jenkins
+    image: jenkins:alpine
+    ports:
+      - 8220:8080
+    networks:
+      dev:
+        ipv4_address: 172.16.238.14
+
+  java9:
+    container_name: java9
+    hostname: java9
+    build:
+      context: ./java9
+      dockerfile: Dockerfile
+    image: java9
+    ports:
+      - 5005:5005
+      - 8230:8080
+      - 9000:9000
+    networks:
+      dev:
+        ipv4_address: 172.16.238.15
+    volumes:
+      - ../../spring-boot-api/:/spring-boot-api/
+      - excluded_build:/spring-boot-api/build
+      - excluded_gradle:/spring-boot-api/.gradle
+
+networks:
+  dev:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+      - subnet: 172.16.238.0/24
+
+volumes:
+  excluded_build:
+  excluded_gradle:
