@@ -13,7 +13,7 @@ Memo
 alias xpath="xmllint --html --xpath 2>/dev/null"
 curl http://localhost:8080/login?from=%2F | tac | tac|  xpath "/html/head/script[20]" -
 
-curl http://localhost:8080/login?from=%2F | grep -o "security-token"
+curl http://localhost:8080/login?from=%2F | grep -o "security-token"
 
 
 curl http://localhost:8080/login?from=%2F | grep -o '<title>(.+)</title>'
