@@ -1,4 +1,4 @@
-version: '3'
+version: '2'
 
 services:
   dev-linux:
@@ -8,9 +8,12 @@ services:
       context: ./dev-linux
       dockerfile: Dockerfile
     image: 'dev-linux'
+    # 256*1024*1024 = 268435456 Byte = 256 MB
+    mem_limit: 268435456
     networks:
-      dev:
-        ipv4_address: 172.16.238.11
+      - dev
+      # dev:
+      #   ipv4_address: 172.16.238.11
     volumes:
       - '../:/root/src'
 
@@ -21,9 +24,13 @@ services:
       context: ./cypress
       dockerfile: Dockerfile
     image: 'dev-cypress'
+    image: 'dev-linux'
+    # 512*1024*1024 = 536870912 Byte = 512 MB
+    mem_limit: 536870912
     networks:
-      dev:
-        ipv4_address: 172.16.238.12
+      - dev
+      # dev:
+      #   ipv4_address: 172.16.238.12
     volumes:
       - '../tests:/root/src/cypress'
 
@@ -34,14 +41,17 @@ services:
       context: ./viron
       dockerfile: Dockerfile
     image: 'viron'
+    # 512*1024*1024 = 536870912 Byte = 512 MB
+    mem_limit: 536870912
     working_dir: /viron
     ports:
       - 8210:8080
     environment:
       - SHELL=/bin/bash
     networks:
-      dev:
-        ipv4_address: 172.16.238.13
+      - dev
+      # dev:
+      #   ipv4_address: 172.16.238.13
     volumes:
       - ./viron/.editorconfig:/viron/.editorconfig
       - ./viron/.eslintrc.js:/viron/.eslintrc.js
@@ -63,38 +73,47 @@ services:
     container_name: jenkins
     hostname: jenkins
     image: jenkins:alpine
+    # 512*1024*1024 = 536870912 Byte = 512 MB
+    mem_limit: 536870912
     ports:
       - 8220:8080
     networks:
-      dev:
-        ipv4_address: 172.16.238.14
+      - dev
+      # dev:
+      #   ipv4_address: 172.16.238.14
 
-  java9:
-    container_name: java9
-    hostname: java9
+  java:
+    container_name: java
+    hostname: java
     build:
-      context: ./java9
+      context: ./java
       dockerfile: Dockerfile
-    image: java9
+      args:
+        java_version: 9
+    image: java
+    # 1024*1024*1024 = 1073741824 Byte = 1024 MB
+    mem_limit: 1073741824
     ports:
-      - 5005:5005
+      - 8300:8300
       - 8230:8080
       - 9000:9000
     networks:
-      dev:
-        ipv4_address: 172.16.238.15
+      - dev
+      # dev:
+      #   ipv4_address: 172.16.238.15
     volumes:
-      - ../../spring-boot-api/:/spring-boot-api/
-      - excluded_build:/spring-boot-api/build
-      - excluded_gradle:/spring-boot-api/.gradle
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ../../spring-boot-api/:/application/
+      - excluded_build:/application/build
+      - excluded_gradle:/application/.gradle
 
 networks:
   dev:
     driver: bridge
     ipam:
       driver: default
-      config:
-      - subnet: 172.16.238.0/24
+      # config:
+      # - subnet: 172.16.238.0/24
 
 volumes:
   excluded_build:
